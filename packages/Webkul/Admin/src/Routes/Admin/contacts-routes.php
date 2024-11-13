@@ -1,10 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Webkul\Admin\Http\Controllers\Contact\MessageController;
 use Webkul\Admin\Http\Controllers\Contact\OrganizationController;
 use Webkul\Admin\Http\Controllers\Contact\Persons\ActivityController;
 use Webkul\Admin\Http\Controllers\Contact\Persons\PersonController;
 use Webkul\Admin\Http\Controllers\Contact\Persons\TagController;
+use Webkul\Admin\Http\Controllers\Contact\Persons\Mess;
 
 Route::prefix('contacts')->group(function () {
     /**
@@ -45,6 +47,10 @@ Route::prefix('contacts')->group(function () {
             Route::get('', 'index')->name('admin.contacts.persons.activities.index');
         });
     });
+
+    Route::get('/messages', [MessageController::class, 'index'])->name('contact.person.messages');
+
+    Route::post('/messages', [MessageController::class, 'store'])->name('contact.person.messages.store');
 
     /**
      * Organization routes.

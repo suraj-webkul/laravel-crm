@@ -36,10 +36,7 @@
 
         {!! view_render_event('admin.persons.index.datagrid.before') !!}
 
-        <v-persons>
-            <!-- Datagrid shimmer -->
-            <x-admin::shimmer.datagrid :is-multi-row="true"/>
-        </v-persons>
+        <v-messages></v-messages>
 
         {!! view_render_event('admin.persons.index.datagrid.after') !!}
     </div>
@@ -47,171 +44,91 @@
     @pushOnce('scripts')        
         <script 
             type="text/x-template"
-            id="v-persons-template"
+            id="v-messages-template"
         >
-            <x-admin::datagrid
-                src="{{ route('admin.contacts.persons.index') }}"
-                :isMultiRow="true"
-                ref="datagrid"
-            >
-                <template #header="{
-                    isLoading,
-                    available,
-                    applied,
-                    selectAll,
-                    sort,
-                    performAction
-                }">
-                    <template v-if="isLoading">
-                        <x-admin::shimmer.datagrid.table.head :isMultiRow="true" />
-                    </template>
-
-                    <template v-else>
-                        <div class="row grid grid-cols-[.1fr_.2fr_.2fr_.2fr_.2fr_.2fr] grid-rows-1 items-center border-b px-4 py-2.5 dark:border-gray-800">
-                            <div
-                                class="flex select-none items-center gap-2.5"
-                                v-for="(columnGroup, index) in [['id'], ['person_name'], ['emails'], ['contact_numbers'], ['organization']]"
-                            >
-                                <label
-                                    class="flex w-max cursor-pointer select-none items-center gap-1"
-                                    for="mass_action_select_all_records"
-                                    v-if="! index"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        name="mass_action_select_all_records"
-                                        id="mass_action_select_all_records"
-                                        class="peer hidden"
-                                        :checked="['all', 'partial'].includes(applied.massActions.meta.mode)"
-                                        @change="selectAll"
-                                    >
-
-                                    <span
-                                        class="icon-checkbox-outline cursor-pointer rounded-md text-2xl text-gray-600 dark:text-gray-300"
-                                        :class="[
-                                            applied.massActions.meta.mode === 'all' ? 'peer-checked:icon-checkbox-select peer-checked:text-brandColor' : (
-                                                applied.massActions.meta.mode === 'partial' ? 'peer-checked:icon-checkbox-multiple peer-checked:text-brandColor' : ''
-                                            ),
-                                        ]"
-                                    >
-                                    </span>
-                                </label>
-
-                                <p class="text-gray-600 dark:text-gray-300">
-                                    <span class="[&>*]:after:content-['_/_']">
-                                        <template v-for="column in columnGroup">
-                                            <span
-                                                class="after:content-['/'] last:after:content-['']"
-                                                :class="{
-                                                    'font-medium text-gray-800 dark:text-white': applied.sort.column == column,
-                                                    'cursor-pointer hover:text-gray-800 dark:hover:text-white': available.columns.find(columnTemp => columnTemp.index === column)?.sortable,
-                                                }"
-                                                @click="
-                                                    available.columns.find(columnTemp => columnTemp.index === column)?.sortable ? sort(available.columns.find(columnTemp => columnTemp.index === column)): {}
-                                                "
-                                            >
-                                                @{{ available.columns.find(columnTemp => columnTemp.index === column)?.label }}
-                                            </span>
-                                        </template>
-                                    </span>
-
-                                    <i
-                                        class="align-text-bottom text-base text-gray-800 dark:text-white ltr:ml-1.5 rtl:mr-1.5"
-                                        :class="[applied.sort.order === 'asc' ? 'icon-down-stat': 'icon-up-stat']"
-                                        v-if="columnGroup.includes(applied.sort.column)"
-                                    ></i>
-                                </p>
+            <div class="mx-auto my-4 flex max-w-3xl flex-col gap-4">
+                <div class="flex items-center gap-4">
+                    <textarea
+                        v-model="message"
+                        name="title"
+                        class="flex-grow rounded border border-gray-300 px-3 py-2 text-sm font-medium text-gray-800 transition-all hover:border-gray-400 focus:border-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-gray-600 dark:focus:border-gray-500"
+                        placeholder="Email Title"
+                    ></textarea>
+                   
+                    <button
+                        @click="store"
+                        class="rounded-md bg-purple-600 px-4 py-2 font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                    >
+                        Send
+                    </button>
+                    
+                    <button
+                        class="rounded-md bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                    >
+                        Add Follower
+                    </button>
+                </div>
+            
+                <div class="flex gap-2" v-for="msg in messages">
+                    <div class="icon-mail mt-2 flex h-9 min-h-9 w-9 min-w-9 items-center justify-center rounded-full bg-green-200 text-xl text-green-900 dark:!text-green-900">
+                        <!-- Icon placeholder, e.g., <i class="fas fa-envelope"></i> -->
+                    </div>
+                    
+                    <div class="flex w-full justify-between gap-4 rounded-md bg-white p-4 shadow-md dark:bg-gray-900 dark:shadow-none">
+                        <div class="flex flex-col gap-2">
+                            <div class="flex flex-col gap-1">
+                                <p class="flex items-center gap-1 font-medium dark:text-white">TEST MAIL FOR THE DRAFT</p>
+                                <p class="text-gray-500 dark:text-gray-300">From: laravel@krayincrm.com</p>
+                                <p class="text-gray-500 dark:text-gray-300">To: c@example.com</p> <!-- Added recipient email -->
                             </div>
                         </div>
-                    </template>
-                </template>
-
-                <template #body="{
-                    isLoading,
-                    available,
-                    applied,
-                    selectAll,
-                    sort,
-                    performAction
-                }">
-                    <template v-if="isLoading">
-                        <x-admin::shimmer.datagrid.table.body :isMultiRow="true" />
-                    </template>
-
-                    <template v-else>
-                        <div
-                            class="row grid grid-cols-[.1fr_.2fr_.2fr_.2fr_.2fr_.2fr] grid-rows-1 border-b px-4 py-2.5 transition-all hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-950"
-                            v-for="record in available.records"
-                        >
-                            <!-- Mass Action and Person ID. -->
-                            <div class="flex items-center gap-2.5">
-                                <input
-                                    type="checkbox"
-                                    :name="`mass_action_select_record_${record.id}`"
-                                    :id="`mass_action_select_record_${record.id}`"
-                                    :value="record.id"
-                                    class="peer hidden"
-                                    v-model="applied.massActions.indices"
-                                >
-
-                                <label
-                                    class="icon-checkbox-outline peer-checked:icon-checkbox-select cursor-pointer rounded-md text-2xl text-gray-600 peer-checked:text-brandColor dark:text-gray-300"
-                                    :for="`mass_action_select_record_${record.id}`"
-                                ></label>
-
-                                <div class="flex flex-col gap-1.5 dark:text-gray-300">
-                                    @{{ record.id }}
-                                </div>
-                            </div>
-
-                            <!-- Name -->
-                            <div class="flex items-center gap-1.5 dark:text-gray-300">
-                                <x-admin::avatar ::name="record.person_name" />
-                            
-                                @{{ record.person_name }}
-                            </div>
-
-                            <!-- Emails -->
-                            <p class="flex items-center dark:text-gray-300">
-                                @{{ record.emails }}
-                            </p>
-
-                            <!-- Contact Numbers -->
-                            <p class="flex items-center dark:text-gray-300">
-                                @{{ record.contact_numbers }}
-                            </p>
-
-                            <!-- Organization -->
-                            <p class="flex items-center dark:text-gray-300">
-                                @{{ record.organization }}
-                            </p>
-                            
-                            <!-- Actions -->
-                            <div class="flex items-center justify-end gap-x-4">
-                                <div class="flex items-center gap-1.5">
-                                    <p
-                                        class="place-self-end"
-                                        v-if="available.actions.length"
-                                    >
-                                        <span
-                                            class="cursor-pointer rounded-md p-1.5 text-2xl transition-all hover:bg-gray-200 dark:hover:bg-gray-800 max-sm:place-self-center"
-                                            :class="action.icon"
-                                            v-text="! action.icon ? action.title : ''"
-                                            v-for="action in record.actions"
-                                            @click="performAction(action)"
-                                        ></span>
-                                    </p>
-                                </div>
-                            </div> 
-                        </div>
-                    </template>
-                </template>
-            </x-admin::datagrid>
+                    </div>
+                </div>
+            </div>
         </script>
 
         <script type="module">
-            app.component('v-persons', {
-                template: '#v-persons-template',
+            app.component('v-messages', {
+                template: '#v-messages-template',
+
+                data() {
+                    return {
+                        messages: [],
+                        message: '',
+                    }
+                },
+
+                mounted() {
+                    this.get();
+                },
+
+                methods: {
+                    get() {
+                        this.$axios.get('{{ route('contact.person.messages') }}')
+                            .then(response => {
+                                this.messages = response.data;
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            })
+                    },
+
+                    store() {
+                        if (this.message == '') {
+                            return;
+                        }
+
+                        this.$axios.post('{{ route('contact.person.messages.store') }}', {
+                            message: this.message
+                        })
+                            .then(response => {
+                                this.get();
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            })
+                    }
+                }
             });
         </script>
     @endPushOnce

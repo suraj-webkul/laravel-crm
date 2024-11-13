@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c9cae30842ed7c9020a3f23f06e1c0b2",
+    "content-hash": "766df32dd345923c6649980876c3ab81",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -8345,19 +8345,18 @@
         },
         {
             "name": "krayin/krayin-package-generator",
-            "version": "dev-master",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/krayin/krayin-package-generator.git",
-                "reference": "44458fba147812176c2f69dba6994d1d421017ce"
+                "reference": "b9a61169ca985e45e83b9225c885b77692793f39"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/krayin/krayin-package-generator/zipball/44458fba147812176c2f69dba6994d1d421017ce",
-                "reference": "44458fba147812176c2f69dba6994d1d421017ce",
+                "url": "https://api.github.com/repos/krayin/krayin-package-generator/zipball/b9a61169ca985e45e83b9225c885b77692793f39",
+                "reference": "b9a61169ca985e45e83b9225c885b77692793f39",
                 "shasum": ""
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -8385,9 +8384,9 @@
             "description": "Krayin Package Generator",
             "support": {
                 "issues": "https://github.com/krayin/krayin-package-generator/issues",
-                "source": "https://github.com/krayin/krayin-package-generator/tree/master"
+                "source": "https://github.com/krayin/krayin-package-generator/tree/v2.0.0"
             },
-            "time": "2021-07-26T15:58:50+00:00"
+            "time": "2024-09-27T04:57:16+00:00"
         },
         {
             "name": "laravel/pint",
@@ -11330,9 +11329,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "krayin/krayin-package-generator": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
