@@ -1,0 +1,28 @@
+{
+    "name": "krayin/laravel-chatter",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Suraj Singh",
+            "email": "suraj@webkul.com"
+        }
+    ],
+    "require": {
+        "krayin/laravel-attribute": "^1.0",
+        "krayin/laravel-core": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkul\\Chatter\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Webkul\\Chatter\\Providers\\ChatterServiceProvider"
+            ],
+            "aliases": {}
+        }
+    },
+    "minimum-stability": "dev"
+}

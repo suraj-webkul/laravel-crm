@@ -214,6 +214,7 @@ return [
         Webkul\Tag\Providers\TagServiceProvider::class,
         Webkul\User\Providers\UserServiceProvider::class,
         Webkul\Warehouse\Providers\WarehouseServiceProvider::class,
+        Webkul\Chatter\Providers\ChatterServiceProvider::class,
         Webkul\WebForm\Providers\WebFormServiceProvider::class,
     ])->toArray(),
 

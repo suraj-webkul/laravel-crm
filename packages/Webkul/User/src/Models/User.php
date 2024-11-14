@@ -6,6 +6,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
+use Webkul\Chatter\Models\LogNote;
+use Webkul\Chatter\Models\Message;
+use Webkul\Chatter\Models\Task;
 use Webkul\User\Contracts\User as UserContract;
 
 class User extends Authenticatable implements UserContract
@@ -99,5 +102,15 @@ class User extends Authenticatable implements UserContract
         }
 
         return in_array($permission, $this->role->permissions);
+    }
+
+    public function followedTasks()
+    {
+        return $this->belongsToMany(Task::class, 'task_user');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
     }
 }

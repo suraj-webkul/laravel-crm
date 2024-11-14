@@ -36,10 +36,7 @@
 
         {!! view_render_event('admin.persons.index.datagrid.before') !!}
 
-        <v-persons>
-            <!-- Datagrid shimmer -->
-            <x-admin::shimmer.datagrid :is-multi-row="true"/>
-        </v-persons>
+        <v-persons></v-persons>
 
         {!! view_render_event('admin.persons.index.datagrid.after') !!}
     </div>
@@ -49,170 +46,250 @@
             type="text/x-template"
             id="v-persons-template"
         >
-            <x-admin::datagrid
-                src="{{ route('admin.contacts.persons.index') }}"
-                :isMultiRow="true"
-                ref="datagrid"
-            >
-                <template #header="{
-                    isLoading,
-                    available,
-                    applied,
-                    selectAll,
-                    sort,
-                    performAction
-                }">
-                    <template v-if="isLoading">
-                        <x-admin::shimmer.datagrid.table.head :isMultiRow="true" />
-                    </template>
+            <div class="box-shadow flex flex-col gap-4 rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 max-xl:flex-wrap">
+                <div class="bg-gray-50 p-4">
+                    <!-- Tabs Section -->
+                    <div class="mb-4 flex space-x-4">
+                        <!-- Send Message Tab -->
+                        <button @click="activeTab = 'sendMessage'" :class="['tab-button', activeTab === 'sendMessage' ? 'bg-gray-200 text-blue-600' : 'text-gray-600']" class="flex items-center space-x-1 rounded-md px-4 py-2 hover:bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle h-4 w-4">
+                                <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+                            </svg>
 
-                    <template v-else>
-                        <div class="row grid grid-cols-[.1fr_.2fr_.2fr_.2fr_.2fr_.2fr] grid-rows-1 items-center border-b px-4 py-2.5 dark:border-gray-800">
-                            <div
-                                class="flex select-none items-center gap-2.5"
-                                v-for="(columnGroup, index) in [['id'], ['person_name'], ['emails'], ['contact_numbers'], ['organization']]"
-                            >
-                                <label
-                                    class="flex w-max cursor-pointer select-none items-center gap-1"
-                                    for="mass_action_select_all_records"
-                                    v-if="! index"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        name="mass_action_select_all_records"
-                                        id="mass_action_select_all_records"
-                                        class="peer hidden"
-                                        :checked="['all', 'partial'].includes(applied.massActions.meta.mode)"
-                                        @change="selectAll"
-                                    >
+                          <span>Send message</span>
+                        </button>
+                
+                        <!-- Log Note Tab -->
+                        <button @click="activeTab = 'logNote'" :class="['tab-button', activeTab === 'logNote' ? 'bg-gray-200 text-blue-600' : 'text-gray-600']" class="flex items-center space-x-1 rounded-md px-4 py-2 hover:bg-gray-100">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard h-4 w-4">
+                                <rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect>
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                           </svg>
 
-                                    <span
-                                        class="icon-checkbox-outline cursor-pointer rounded-md text-2xl text-gray-600 dark:text-gray-300"
-                                        :class="[
-                                            applied.massActions.meta.mode === 'all' ? 'peer-checked:icon-checkbox-select peer-checked:text-brandColor' : (
-                                                applied.massActions.meta.mode === 'partial' ? 'peer-checked:icon-checkbox-multiple peer-checked:text-brandColor' : ''
-                                            ),
-                                        ]"
-                                    >
-                                    </span>
-                                </label>
+                          <span>Log note</span>
+                        </button>
+                
+                        <!-- Pinned Message Tab -->
+                        <button @click="activeTab = 'pinnedMessage'" :class="['tab-button', activeTab === 'pinnedMessage' ? 'bg-gray-200 text-blue-600' : 'text-gray-600']" class="flex items-center space-x-1 rounded-md px-4 py-2 hover:bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pin h-4 w-4">
+                                <line x1="12" x2="12" y1="17" y2="22"></line>
+                                <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path>
+                            </svg>
 
-                                <p class="text-gray-600 dark:text-gray-300">
-                                    <span class="[&>*]:after:content-['_/_']">
-                                        <template v-for="column in columnGroup">
-                                            <span
-                                                class="after:content-['/'] last:after:content-['']"
-                                                :class="{
-                                                    'font-medium text-gray-800 dark:text-white': applied.sort.column == column,
-                                                    'cursor-pointer hover:text-gray-800 dark:hover:text-white': available.columns.find(columnTemp => columnTemp.index === column)?.sortable,
-                                                }"
-                                                @click="
-                                                    available.columns.find(columnTemp => columnTemp.index === column)?.sortable ? sort(available.columns.find(columnTemp => columnTemp.index === column)): {}
-                                                "
+                            <span>Pinned Message</span>
+                        </button>
+                
+                        <!-- Schedule Activity Tab -->
+                        <x-admin::dropdown position="bottom-right">
+                            <x-slot:toggle>
+                                <button  class="flex items-center space-x-1 rounded-md px-4 py-2 hover:bg-gray-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar h-4 w-4">
+                                        <path d="M8 2v4"></path>
+                                        <path d="M16 2v4"></path>
+                                        <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                                        <path d="M3 10h18"></path>
+                                    </svg>
+        
+                                    <span>Add Followers</span>
+                                </button>
+                            </x-slot>
+                
+                            <!-- Admin Dropdown -->
+                            <x-slot:content class="mt-2 border-t-0 !p-2">
+                                <h2 class="mb-3 text-sm font-semibold">Add Followers</h2>
+
+                                <div class="space-y-2" v-for="follower in followers">
+                                    <div class="flex items-center justify-between gap-3 rounded-md p-2 hover:bg-gray-50">
+                                        <div class="flex items-center gap-4 space-x-2">
+                                            <img src="https://erp.webkul.com/web/image/res.partner/100212/image_128" alt="Devansh Bawari" class="h-8 w-8 rounded-full">
+                                            <span class="text-sm text-gray-700">@{{ follower.name }} </span>
+                                        </div>
+
+                                        <div class="flex items-center space-x-2">
+                                            <button 
+                                                class="text-gray-500 hover:text-gray-700"
+                                                @click="removeFollower(follower)"
                                             >
-                                                @{{ available.columns.find(columnTemp => columnTemp.index === column)?.label }}
-                                            </span>
-                                        </template>
-                                    </span>
-
-                                    <i
-                                        class="align-text-bottom text-base text-gray-800 dark:text-white ltr:ml-1.5 rtl:mr-1.5"
-                                        :class="[applied.sort.order === 'asc' ? 'icon-down-stat': 'icon-up-stat']"
-                                        v-if="columnGroup.includes(applied.sort.column)"
-                                    ></i>
-                                </p>
-                            </div>
-                        </div>
-                    </template>
-                </template>
-
-                <template #body="{
-                    isLoading,
-                    available,
-                    applied,
-                    selectAll,
-                    sort,
-                    performAction
-                }">
-                    <template v-if="isLoading">
-                        <x-admin::shimmer.datagrid.table.body :isMultiRow="true" />
-                    </template>
-
-                    <template v-else>
-                        <div
-                            class="row grid grid-cols-[.1fr_.2fr_.2fr_.2fr_.2fr_.2fr] grid-rows-1 border-b px-4 py-2.5 transition-all hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-950"
-                            v-for="record in available.records"
-                        >
-                            <!-- Mass Action and Person ID. -->
-                            <div class="flex items-center gap-2.5">
-                                <input
-                                    type="checkbox"
-                                    :name="`mass_action_select_record_${record.id}`"
-                                    :id="`mass_action_select_record_${record.id}`"
-                                    :value="record.id"
-                                    class="peer hidden"
-                                    v-model="applied.massActions.indices"
-                                >
-
-                                <label
-                                    class="icon-checkbox-outline peer-checked:icon-checkbox-select cursor-pointer rounded-md text-2xl text-gray-600 peer-checked:text-brandColor dark:text-gray-300"
-                                    :for="`mass_action_select_record_${record.id}`"
-                                ></label>
-
-                                <div class="flex flex-col gap-1.5 dark:text-gray-300">
-                                    @{{ record.id }}
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
+                                                <path d="M18 6 6 18"></path>
+                                                <path d="m6 6 12 12"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            </x-slot>
+                        </x-admin::dropdown>
+                    </div>
 
-                            <!-- Name -->
-                            <div class="flex items-center gap-1.5 dark:text-gray-300">
-                                <x-admin::avatar ::name="record.person_name" />
-                            
-                                @{{ record.person_name }}
-                            </div>
+                    <!-- Send Message Section -->
+                    <div v-if="activeTab === 'sendMessage'" class="rounded-lg bg-white p-4">
+                        <div class="rounded-lg bg-white sm:w-1/3 md:w-1/2">
+                            <div class="p-4">
+                                <div class="mb-2 text-sm text-gray-500">To: Followers of "Project Name"</div>
 
-                            <!-- Emails -->
-                            <p class="flex items-center dark:text-gray-300">
-                                @{{ record.emails }}
-                            </p>
+                                <div class="">
+                                    <div class="rounded-lg border">
+                                        <x-admin::form.control-group class="!mb-0">
+                                            <x-admin::form.control-group.control
+                                                type="textarea"
+                                                name="reply"
+                                                id="reply"
+                                                rules="required"
+                                                :tinymce="true"
+                                                v-model="message"
+                                            />
+    
+                                            <x-admin::form.control-group.error control-name="reply" />
+                                        </x-admin::form.control-group>
 
-                            <!-- Contact Numbers -->
-                            <p class="flex items-center dark:text-gray-300">
-                                @{{ record.contact_numbers }}
-                            </p>
+                                        <div class="flex items-center justify-between border-t bg-gray-50 px-2 py-2">
+                                            <div class="flex space-x-2">
+                                                <!-- Message -->
+                                                <button class="rounded-md p-2 hover:bg-gray-200">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image h-5 w-5 text-gray-500">
+                                                        <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
 
-                            <!-- Organization -->
-                            <p class="flex items-center dark:text-gray-300">
-                                @{{ record.organization }}
-                            </p>
-                            
-                            <!-- Actions -->
-                            <div class="flex items-center justify-end gap-x-4">
-                                <div class="flex items-center gap-1.5">
-                                    <p
-                                        class="place-self-end"
-                                        v-if="available.actions.length"
+                                                        <circle cx="9" cy="9" r="2"></circle>
+
+                                                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+                                                    </svg>
+                                                </button>
+
+                                                <!-- Attachement -->
+                                                <button class="rounded-md p-2 hover:bg-gray-200">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-paperclip h-5 w-5 text-gray-500">
+                                                        <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <div class="flex space-x-2">
+                                        <button class="text-green-600 hover:text-green-700">Following</button>
+
+                                        <span class="text-gray-400">•</span>
+
+                                        <span class="text-gray-600">3</span>
+                                    </div>
+
+                                    <button 
+                                        @click="sendMessage"
+                                        class="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                                     >
-                                        <span
-                                            class="cursor-pointer rounded-md p-1.5 text-2xl transition-all hover:bg-gray-200 dark:hover:bg-gray-800 max-sm:place-self-center"
-                                            :class="action.icon"
-                                            v-text="! action.icon ? action.title : ''"
-                                            v-for="action in record.actions"
-                                            @click="performAction(action)"
-                                        ></span>
-                                    </p>
+                                        Send
+                                    </button>
                                 </div>
-                            </div> 
+                            </div>
                         </div>
-                    </template>
-                </template>
-            </x-admin::datagrid>
+                    </div>
+
+                    <div v-if="activeTab === 'logNote'" class="tab-content rounded-lg bg-white p-4">
+                        <p>Log Note Content</p>
+                    </div>
+
+                    <div v-if="activeTab === 'pinnedMessage'" class="tab-content rounded-lg bg-white p-4">
+                        <p>Pinned Message Content</p>
+                    </div>
+
+                    <div v-if="activeTab === 'scheduleActivity'" class="tab-content rounded-lg bg-white p-4">
+                        <p>Schedule Activity Content</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-shadow flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900 max-xl:flex-wrap">
+                <div class="min-h-full w-full" v-for="message in messages">
+                    <div class="mx-auto max-w-5xl bg-white">
+                        <div class="border-b border-gray-200 py-4">
+                            <div class="mb-4 flex gap-3">
+                                <div class="flex-shrink-0">
+                                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="lucide lucide-circle h-4 w-4 text-gray-400">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <div class="flex-grow">
+                                    <div class="mb-2 flex items-center gap-2">
+                                        <span class="font-medium text-gray-900">@{{ message.user.name }}</span>
+                                        <span class="text-sm text-gray-500">@{{ message.ago }}</span>
+                                    </div>
+
+                                    <div class="mb-4" v-html="message.content"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </script>
 
         <script type="module">
-            app.component('v-persons', {
-                template: '#v-persons-template',
-            });
+         app.component('v-persons', {
+            template: '#v-persons-template',
+
+            data() {
+                return {
+                    users: [],
+                    followers: [],
+                    messages: [],
+                    activeTab: '',
+                    message: '',
+                };
+            },
+
+            mounted() {
+                this.getMessages();
+                this.getFollowers();
+            },
+
+            methods: {
+                getFollowers() {
+                    this.$axios.get('{{ route('tasks.getFollowers', 1) }}')
+                        .then(response => {
+                            this.followers = response.data;
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                },
+
+                getMessages() {
+                    this.$axios.get('{{ route('tasks.showMessages', 1) }}')
+                        .then(response => {
+                            this.messages = response.data;
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                },
+
+                sendMessage() {
+                    if (this.message == '') {
+                        return;
+                    }
+
+                    this.$axios.post('{{ route('tasks.postMessage', 1) }}', {
+                        content: this.message
+                    })
+                        .then(response => {
+                            console.log(response);
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                },
+            },
+        });
+
         </script>
     @endPushOnce
 </x-admin::layouts>

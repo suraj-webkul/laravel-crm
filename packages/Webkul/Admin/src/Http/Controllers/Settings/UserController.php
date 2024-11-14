@@ -257,4 +257,25 @@ class UserController extends Controller
             'message' => trans('admin::app.settings.users.index.mass-delete-success'),
         ]);
     }
+
+    public function current()
+    {
+        return response()->json(auth()->user()->load('following'));
+    }
+
+    public function getUsers()
+    {
+        return response()->json(
+            $this->userRepository->where('id', '!=', auth()->id())
+                ->with('followers')
+                ->get()
+        );
+    }
+
+    public function show($id)
+    {
+        $user = $this->userRepository->findOrFail($id);
+
+        return response()->json($user->load(['followers', 'following']));
+    }
 }
